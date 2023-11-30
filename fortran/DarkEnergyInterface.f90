@@ -1,4 +1,4 @@
-    module DarkEnergyInterface
+module DarkEnergyInterface
     use precision
     use interpolation
     use classes
@@ -25,9 +25,12 @@
 
     type, extends(TDarkEnergyModel) :: TDarkEnergyEqnOfState
         !Type supporting w, wa or general w(z) table
-        real(dl) :: w_lam = -1_dl !p/rho for the dark energy (an effective value, used e.g. for halofit)
+        real(dl) :: w_lam = -1_dl !p/rho for the dark energy (an effective value, used e.g. for halofit), cosmological constant today
         real(dl) :: wa = 0._dl !may not be used, just for compatibility with e.g. halofit
         real(dl) :: cs2_lam = 1_dl !rest-frame sound speed, though may not be used
+	    real(dl) :: SteepnessDE !steepness of the transition
+	    real(dl) :: a_trans !value of scale factor at transition
+	    real(dl) :: w_m !equation of state of dark matter
         logical :: use_tabulated_w = .false.  !Use interpolated table; note this is quite slow.
         logical :: no_perturbations = .false. !Don't change this, no perturbations is unphysical
         !Interpolations if use_tabulated_w=.true.
@@ -180,6 +183,14 @@
 
     end subroutine TDarkEnergyEqnOfState_SetwTable
 
+    function Gamma(a, a_t, SteepnessDE) result(gamma_a)
+	class(TDarkEnergyEqnOfState)
+	real(dl), intent(IN) :: a, a_trans, SteepnessDE
+	real(dl), intent(OUT) :: gamma_a
+
+	gamma_a = (((1-EXP(-(a-1)/SteepnessDE))/(1-EXP(1/SteepnessDE)))*((1+EXP(a_trans/SteepnessDE))/(1+EXP(-(a-a_trans)/SteepnessDE))))
+
+    end function Gamma
 
     function TDarkEnergyEqnOfState_w_de(this, a)
     class(TDarkEnergyEqnOfState) :: this
@@ -187,7 +198,7 @@
     real(dl), intent(IN) :: a
 
     if(.not. this%use_tabulated_w) then
-        TDarkEnergyEqnOfState_w_de= this%w_lam+ this%wa*(1._dl-a)
+	TDarkEnergyEqnOfState_w_de= this%w_lam + (this%wa - this%w_lam)*Gamma(a, this%a_trans, this%SteepnessDE)
     else
         al=dlog(a)
         if(al <= this%equation_of_state%Xmin_interp) then
@@ -211,14 +222,37 @@
 
     end subroutine TDarkEnergyEqnOfState_Effective_w_wa
 
+    function Integrate_Dark_Energy(this) result(result)
+    class(TDarkEnergyEqnOfState), intent(inout) :: this
+    real(dl) :: result
+    integer :: neval, infod
+    real(dl) :: intl, fnl
+
+    !Limits
+    intl = 1._dl
+    fnl = this%a
+
+    !Call QUADPACK routine for numerical integration
+    call dqagse(integrable_function, intl, fnl, 1.0E-10_dl, 1.0E-10_dl, result, neval, infod)
+
+    contains
+
+      !Integrating Dark Energy Function
+      real(dl) function integrable_function(a_prime)
+        real(dl), intent(in) :: a_prime
+        integrable_function = Gamma(a_prime, a_t, SteepnessDE) / a_prime
+      end function integrable_function
+
+  end function Integrate_Dark_Energy
+
     function TDarkEnergyEqnOfState_grho_de(this, a) result(grho_de) !relative density (8 pi G a^4 rho_de /grhov)
     class(TDarkEnergyEqnOfState) :: this
     real(dl) :: grho_de, al, fint
     real(dl), intent(IN) :: a
 
     if(.not. this%use_tabulated_w) then
-        grho_de = a ** (1._dl - 3. * this%w_lam - 3. * this%wa)
-        if (this%wa/=0) grho_de=grho_de*exp(-3. * this%wa * (1._dl - a))
+        grho_de = a ** (1._dl - 3. * this%w_lam)
+        if (this%wa/=0) grho_de=grho_de*exp(-3. * (this%w_m - this%w_lam) * (Integrate_Dark_Energy(a)))
     else
         if(a == 0.d0)then
             grho_de = 0.d0      !assume rho_de*a^4-->0, when a-->0, OK if w_de always <0.
@@ -260,6 +294,8 @@
     if(.not. this%use_tabulated_w)then
         this%w_lam = Ini%Read_Double('w', -1.d0)
         this%wa = Ini%Read_Double('wa', 0.d0)
+	this%SteepnessDE = Ini%Read_Double('SteepnessDE', -1.d0)
+	this%a_trans = Ini%Read_Double('SteepnessDE', -1.d0)
         ! trap dark energy becoming important at high redshift 
         ! (will still work if this test is removed in some cases)
         if (this%w_lam + this%wa > 0) &
