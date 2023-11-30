@@ -183,8 +183,8 @@ module DarkEnergyInterface
 
     end subroutine TDarkEnergyEqnOfState_SetwTable
 
-    function Gamma(a, a_t, SteepnessDE) result(gamma_a)
-	class(TDarkEnergyEqnOfState)
+    function Gamma(a, a_trans, SteepnessDE) result(gamma_a)
+	class(TDarkEnergyEqnOfState) :: this
 	real(dl), intent(IN) :: a, a_trans, SteepnessDE
 	real(dl), intent(OUT) :: gamma_a
 
@@ -230,7 +230,7 @@ module DarkEnergyInterface
 
     !Limits
     intl = 1._dl
-    fnl = this%a
+    fnl = a
 
     !Call QUADPACK routine for numerical integration
     call dqagse(integrable_function, intl, fnl, 1.0E-10_dl, 1.0E-10_dl, result, neval, infod)
@@ -240,7 +240,7 @@ module DarkEnergyInterface
       !Integrating Dark Energy Function
       real(dl) function integrable_function(a_prime)
         real(dl), intent(in) :: a_prime
-        integrable_function = Gamma(a_prime, a_t, SteepnessDE) / a_prime
+        integrable_function = Gamma(a_prime, a_trans, SteepnessDE) / a_prime
       end function integrable_function
 
   end function Integrate_Dark_Energy
@@ -294,8 +294,9 @@ module DarkEnergyInterface
     if(.not. this%use_tabulated_w)then
         this%w_lam = Ini%Read_Double('w', -1.d0)
         this%wa = Ini%Read_Double('wa', 0.d0)
-	this%SteepnessDE = Ini%Read_Double('SteepnessDE', -1.d0)
-	this%a_trans = Ini%Read_Double('SteepnessDE', -1.d0)
+	    this%SteepnessDE = Ini%Read_Double('SteepnessDE', 0.5.d0)
+	    this%a_trans = Ini%Read_Double('SteepnessDE', 0.5.d0)
+        this%w_m = Ini%Read_Double('wm', -1.2.d0)
         ! trap dark energy becoming important at high redshift 
         ! (will still work if this test is removed in some cases)
         if (this%w_lam + this%wa > 0) &
