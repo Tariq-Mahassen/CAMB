@@ -183,7 +183,7 @@ module DarkEnergyInterface
 
     end subroutine TDarkEnergyEqnOfState_SetwTable
 
-    function Gamma(a, a_trans, SteepnessDE) result(gamma_a)
+    function Gamma(a, a_trans, SteepnessDE)
 	class(TDarkEnergyEqnOfState) :: this
 	real(dl), intent(IN) :: a, a_trans, SteepnessDE
 	real(dl), intent(OUT) :: gamma_a
@@ -195,10 +195,13 @@ module DarkEnergyInterface
     function TDarkEnergyEqnOfState_w_de(this, a)
     	class(TDarkEnergyEqnOfState) :: this
     	real(dl) :: TDarkEnergyEqnOfState_w_de, al
-    	real(dl), intent(IN) :: a
+    	real(dl), intent(IN) :: a, gamma_func
+
+        gamma_func = Gamma(a, this%a_trans, this%SteepnessDE)
+
 
     if(.not. this%use_tabulated_w) then
-	TDarkEnergyEqnOfState_w_de= this%w_lam + (this%wa - this%w_lam)*Gamma(a, this%a_trans, this%SteepnessDE)
+	TDarkEnergyEqnOfState_w_de= this%w_lam + (this%wa - this%w_lam)*gamma_func
     else
         al=dlog(a)
         if(al <= this%equation_of_state%Xmin_interp) then
@@ -294,9 +297,9 @@ module DarkEnergyInterface
     if(.not. this%use_tabulated_w)then
         this%w_lam = Ini%Read_Double('w', -1.d0)
         this%wa = Ini%Read_Double('wa', 0.d0)
-	    this%SteepnessDE = Ini%Read_Double('SteepnessDE', 0.5.d0)
-	    this%a_trans = Ini%Read_Double('a_trans', 0.5.d0)
-        this%w_m = Ini%Read_Double('wm', -1.2.d0)
+	    this%SteepnessDE = Ini%Read_Double('SteepnessDE', 1.d0)
+	    this%a_trans = Ini%Read_Double('a_trans', 1.d0)
+        this%w_m = Ini%Read_Double('w_m', -1.d0)
         ! trap dark energy becoming important at high redshift 
         ! (will still work if this test is removed in some cases)
         if (this%w_lam + this%wa > 0) &
