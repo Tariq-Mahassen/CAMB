@@ -28,9 +28,9 @@ module DarkEnergyInterface
         real(dl) :: w_lam = -1_dl !p/rho for the dark energy (an effective value, used e.g. for halofit), cosmological constant today
         real(dl) :: wa = 0._dl !may not be used, just for compatibility with e.g. halofit
         real(dl) :: cs2_lam = 1_dl !rest-frame sound speed, though may not be used
-	    real(dl) :: SteepnessDE !steepness of the transition
-	    real(dl) :: a_trans !value of scale factor at transition
-	    real(dl) :: w_m !equation of state of dark matter
+	real(dl) :: SteepnessDE !steepness of the transition
+	real(dl) :: a_trans !value of scale factor at transition
+	real(dl) :: w_m !equation of state of dark matter
         logical :: use_tabulated_w = .false.  !Use interpolated table; note this is quite slow.
         logical :: no_perturbations = .false. !Don't change this, no perturbations is unphysical
         !Interpolations if use_tabulated_w=.true.
@@ -193,9 +193,9 @@ module DarkEnergyInterface
     end function Gamma
 
     function TDarkEnergyEqnOfState_w_de(this, a)
-    class(TDarkEnergyEqnOfState) :: this
-    real(dl) :: TDarkEnergyEqnOfState_w_de, al
-    real(dl), intent(IN) :: a
+    	class(TDarkEnergyEqnOfState) :: this
+    	real(dl) :: TDarkEnergyEqnOfState_w_de, al
+    	real(dl), intent(IN) :: a
 
     if(.not. this%use_tabulated_w) then
 	TDarkEnergyEqnOfState_w_de= this%w_lam + (this%wa - this%w_lam)*Gamma(a, this%a_trans, this%SteepnessDE)
@@ -228,20 +228,31 @@ module DarkEnergyInterface
     integer :: neval, infod
     real(dl) :: intl, fnl
 
+<<<<<<< HEAD
     !Limits
     intl = 1._dl
     fnl = a
+=======
+    	!Limits
+    	intl = 1._dl
+    	fnl = this%a
+>>>>>>> 889bd3b30030f2a9ce4db91f3616e57304b4f783
 
-    !Call QUADPACK routine for numerical integration
-    call dqagse(integrable_function, intl, fnl, 1.0E-10_dl, 1.0E-10_dl, result, neval, infod)
+    	!Call QUADPACK routine for numerical integration
+    	call dqagse(integrable_function, intl, fnl, 1.0E-10_dl, 1.0E-10_dl, result, neval, infod)
 
     contains
 
-      !Integrating Dark Energy Function
-      real(dl) function integrable_function(a_prime)
+      	!Integrating Dark Energy Function
+      	real(dl) function integrable_function(a_prime)
         real(dl), intent(in) :: a_prime
+<<<<<<< HEAD
         integrable_function = Gamma(a_prime, a_trans, SteepnessDE) / a_prime
       end function integrable_function
+=======
+        integrable_function = Gamma(a_prime, this%a_t, this%SteepnessDE) / a_prime
+        end function integrable_function
+>>>>>>> 889bd3b30030f2a9ce4db91f3616e57304b4f783
 
   end function Integrate_Dark_Energy
 
