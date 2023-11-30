@@ -28,9 +28,9 @@ module DarkEnergyInterface
         real(dl) :: w_lam = -1_dl !p/rho for the dark energy (an effective value, used e.g. for halofit), cosmological constant today
         real(dl) :: wa = 0._dl !may not be used, just for compatibility with e.g. halofit
         real(dl) :: cs2_lam = 1_dl !rest-frame sound speed, though may not be used
-	real(dl) :: SteepnessDE !steepness of the transition
-	real(dl) :: a_trans !value of scale factor at transition
-	real(dl) :: w_m !equation of state of dark matter
+	real(dl) :: SteepnessDE = 0.5_dl !steepness of the transition
+	real(dl) :: a_trans = 0.5_dl !value of scale factor at transition
+	real(dl) :: w_m = -1_dl !equation of state of dark matter
         logical :: use_tabulated_w = .false.  !Use interpolated table; note this is quite slow.
         logical :: no_perturbations = .false. !Don't change this, no perturbations is unphysical
         !Interpolations if use_tabulated_w=.true.
@@ -201,7 +201,7 @@ module DarkEnergyInterface
 
 
     if(.not. this%use_tabulated_w) then
-	TDarkEnergyEqnOfState_w_de= this%w_lam + (this%wa - this%w_lam)*gamma_func
+	TDarkEnergyEqnOfState_w_de= this%w_lam + (this%w_m - this%w_lam)*gamma_func
     else
         al=dlog(a)
         if(al <= this%equation_of_state%Xmin_interp) then
@@ -229,7 +229,7 @@ module DarkEnergyInterface
     class(TDarkEnergyEqnOfState), intent(inout) :: this
     real(dl) :: result
     integer :: neval, infod
-    real(dl) :: intl, fnl
+    real(dl) :: a, intl, fnl,
 
     !Limits
     intl = 1._dl
@@ -298,7 +298,7 @@ module DarkEnergyInterface
         this%w_lam = Ini%Read_Double('w', -1.d0)
         this%wa = Ini%Read_Double('wa', 0.d0)
 	    this%SteepnessDE = Ini%Read_Double('SteepnessDE', 1.d0)
-	    this%a_trans = Ini%Read_Double('a_trans', 1.d0)
+	    this%a_trans = Ini%Read_Double('a_trans', 0.5_d0)
         this%w_m = Ini%Read_Double('w_m', -1.d0)
         ! trap dark energy becoming important at high redshift 
         ! (will still work if this test is removed in some cases)
