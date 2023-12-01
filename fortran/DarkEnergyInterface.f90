@@ -185,23 +185,23 @@ module DarkEnergyInterface
 
     function Gamma(a, a_trans, SteepnessDE)
 	class(TDarkEnergyEqnOfState) :: this
-	real(dl), intent(IN) :: a, a_trans, SteepnessDE
-	real(dl), intent(OUT) :: gamma_a
+	real(dl), intent(IN) :: a
+	real(dl), intent(OUT) :: gammaa
 
-	gamma_a = (((1-EXP(-(a-1)/SteepnessDE))/(1-EXP(1/SteepnessDE)))*((1+EXP(a_trans/SteepnessDE))/(1+EXP(-(a-a_trans)/SteepnessDE))))
+	gammaa = (((1-EXP(-(a-1)/this%SteepnessDE))/(1-EXP(1/this%SteepnessDE)))*((1+EXP(this%a_trans/this%SteepnessDE))/(1+EXP(-(a-this%a_trans)/this%SteepnessDE))))
 
     end function Gamma
 
     function TDarkEnergyEqnOfState_w_de(this, a)
     	class(TDarkEnergyEqnOfState) :: this
     	real(dl) :: TDarkEnergyEqnOfState_w_de, al
-    	real(dl), intent(IN) :: a, gamma_func
+    	real(dl), intent(IN) :: a, gammafunc
 
-        gamma_func = Gamma(a, this%a_trans, this%SteepnessDE)
+        gammafunc = Gamma(a, this%a_trans, this%SteepnessDE)
 
 
     if(.not. this%use_tabulated_w) then
-	TDarkEnergyEqnOfState_w_de= this%w_lam + (this%w_m - this%w_lam)*gamma_func
+	TDarkEnergyEqnOfState_w_de= this%w_lam + (this%w_m - this%w_lam)*gammafunc
     else
         al=dlog(a)
         if(al <= this%equation_of_state%Xmin_interp) then
