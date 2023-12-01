@@ -29,7 +29,7 @@ module DarkEnergyInterface
         real(dl) :: wa = 0._dl !may not be used, just for compatibility with e.g. halofit
         real(dl) :: cs2_lam = 1_dl !rest-frame sound speed, though may not be used
 	real(dl) :: SteepnessDE = 0.5_dl !steepness of the transition
-	real(dl) :: a_trans = 0.5_dl !value of scale factor at transition
+	real(dl) :: atrans = 0.5_dl !value of scale factor at transition
 	real(dl) :: w_m = -1_dl !equation of state of dark matter
         logical :: use_tabulated_w = .false.  !Use interpolated table; note this is quite slow.
         logical :: no_perturbations = .false. !Don't change this, no perturbations is unphysical
@@ -183,12 +183,12 @@ module DarkEnergyInterface
 
     end subroutine TDarkEnergyEqnOfState_SetwTable
 
-    function Gamma(a, a_trans, SteepnessDE)
+    function Gamma(a)
 	class(TDarkEnergyEqnOfState) :: this
 	real(dl), intent(IN) :: a
 	real(dl), intent(OUT) :: gammaa
 
-	gammaa = (((1-EXP(-(a-1)/this%SteepnessDE))/(1-EXP(1/this%SteepnessDE)))*((1+EXP(this%a_trans/this%SteepnessDE))/(1+EXP(-(a-this%a_trans)/this%SteepnessDE))))
+	gammaa = (((1-EXP(-(a-1)/this%SteepnessDE))/(1-EXP(1/this%SteepnessDE)))*((1+EXP(this%atrans/this%SteepnessDE))/(1+EXP(-(a-this%atrans)/this%SteepnessDE))))
 
     end function Gamma
 
@@ -197,7 +197,7 @@ module DarkEnergyInterface
     	real(dl) :: TDarkEnergyEqnOfState_w_de, al
     	real(dl), intent(IN) :: a, gammafunc
 
-        gammafunc = Gamma(a, this%a_trans, this%SteepnessDE)
+        gammafunc = Gamma(a, this%atrans, this%SteepnessDE)
 
 
     if(.not. this%use_tabulated_w) then
@@ -243,7 +243,7 @@ module DarkEnergyInterface
       	!Integrating Dark Energy Function
       	real(dl) function integrable_function(a_prime)
         real(dl), intent(in) :: a_prime
-        integrable_function = Gamma(a_prime, this%a_trans, this%SteepnessDE) / a_prime
+        integrable_function = Gamma(a_prime, this%atrans, this%SteepnessDE) / a_prime
       end function integrable_function
 
   end function Integrate_Dark_Energy
@@ -298,7 +298,7 @@ module DarkEnergyInterface
         this%w_lam = Ini%Read_Double('w', -1.d0)
         this%wa = Ini%Read_Double('wa', 0.d0)
 	    this%SteepnessDE = Ini%Read_Double('SteepnessDE', 0.5_dl)
-	    this%a_trans = Ini%Read_Double('a_trans', 0.5_dl)
+	    this%atrans = Ini%Read_Double('atrans', 0.5_dl)
         this%w_m = Ini%Read_Double('w_m', -1.d0)
         ! trap dark energy becoming important at high redshift 
         ! (will still work if this test is removed in some cases)
