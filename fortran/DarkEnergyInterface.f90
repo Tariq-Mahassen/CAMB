@@ -242,8 +242,8 @@ module DarkEnergyInterface
 
       	!Integrating Dark Energy Function
       	real(dl) function integrable_function(a_prime)
-        real(dl), intent(in) :: a_prime
-        integrable_function = Gamma(a_prime, this%atrans, this%SteepnessDE) / a_prime
+        real(dl), intent(in) :: a_prime, integrable_function
+        integrable_function = Gamma(a_prime) / a_prime
       end function integrable_function
 
   end function Integrate_Dark_Energy
