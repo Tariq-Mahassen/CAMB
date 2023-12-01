@@ -243,7 +243,7 @@ module DarkEnergyInterface
       	!Integrating Dark Energy Function
       	real(dl) function integrable_function(a_prime)
         real(dl), intent(in) :: a_prime
-        integrable_function = Gamma(a_prime, a_trans, SteepnessDE) / a_prime
+        integrable_function = Gamma(a_prime, this%a_trans, this%SteepnessDE) / a_prime
       end function integrable_function
 
   end function Integrate_Dark_Energy
@@ -297,7 +297,7 @@ module DarkEnergyInterface
     if(.not. this%use_tabulated_w)then
         this%w_lam = Ini%Read_Double('w', -1.d0)
         this%wa = Ini%Read_Double('wa', 0.d0)
-	    this%SteepnessDE = Ini%Read_Double('SteepnessDE', 0.5_d0)
+	    this%SteepnessDE = Ini%Read_Double('SteepnessDE', 0.5_dl)
 	    this%a_trans = Ini%Read_Double('a_trans', 0.5_dl)
         this%w_m = Ini%Read_Double('w_m', -1.d0)
         ! trap dark energy becoming important at high redshift 
