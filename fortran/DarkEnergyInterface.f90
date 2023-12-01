@@ -229,7 +229,7 @@ module DarkEnergyInterface
     class(TDarkEnergyEqnOfState), intent(inout) :: this
     real(dl) :: result
     integer :: neval, infod
-    real(dl) :: a, intl, fnl,
+    real(dl) :: a, intl, fnl
 
     !Limits
     intl = 1._dl
@@ -297,8 +297,8 @@ module DarkEnergyInterface
     if(.not. this%use_tabulated_w)then
         this%w_lam = Ini%Read_Double('w', -1.d0)
         this%wa = Ini%Read_Double('wa', 0.d0)
-	    this%SteepnessDE = Ini%Read_Double('SteepnessDE', 1.d0)
-	    this%a_trans = Ini%Read_Double('a_trans', 0.5_d0)
+	    this%SteepnessDE = Ini%Read_Double('SteepnessDE', 0.5_d0)
+	    this%a_trans = Ini%Read_Double('a_trans', 0.5_dl)
         this%w_m = Ini%Read_Double('w_m', -1.d0)
         ! trap dark energy becoming important at high redshift 
         ! (will still work if this test is removed in some cases)
