@@ -186,6 +186,7 @@ module DarkEnergyInterface
     function Gamma(a)
 	class(TDarkEnergyEqnOfState) :: this
 	real(dl), intent(IN) :: a
+    real(dl) :: Gamma
 	real(dl), intent(OUT) :: gammaa
 
 	gammaa = (((1-EXP(-(a-1)/this%SteepnessDE))/&
