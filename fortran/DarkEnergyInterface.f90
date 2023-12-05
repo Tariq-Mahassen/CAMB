@@ -185,8 +185,8 @@ module DarkEnergyInterface
 
     end subroutine TDarkEnergyEqnOfState_SetwTable
 
-    function Gamma(a)
-	!class(TDarkEnergyEqnOfState) :: this
+    function Gamma(this, a)
+	class(TDarkEnergyEqnOfState) :: this
 	real(dl), intent(IN) :: a
     real(dl) :: Gamma
 	!real(dl), intent(OUT) :: Gamma
