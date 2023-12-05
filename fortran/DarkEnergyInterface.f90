@@ -17,7 +17,7 @@ module DarkEnergyInterface
     procedure :: PerturbationInitial
     procedure :: PerturbationEvolve
     procedure :: PrintFeedback
-    procedure :: Gamma
+    !procedure :: Gamma
     ! do not have to implement w_de or grho_de if BackgroundDensityAndPressure is inherited directly
     procedure :: w_de
     procedure :: grho_de
@@ -42,7 +42,7 @@ module DarkEnergyInterface
     procedure :: SetwTable => TDarkEnergyEqnOfState_SetwTable
     procedure :: PrintFeedback => TDarkEnergyEqnOfState_PrintFeedback
     procedure :: w_de => TDarkEnergyEqnOfState_w_de
-    procedure :: Gamma => TDarkEnergyEqnOfState_Gamma
+    !procedure :: Gamma => Gamma
     procedure :: grho_de => TDarkEnergyEqnOfState_grho_de
     procedure :: Effective_w_wa => TDarkEnergyEqnOfState_Effective_w_wa
     end type TDarkEnergyEqnOfState
@@ -185,17 +185,17 @@ module DarkEnergyInterface
 
     end subroutine TDarkEnergyEqnOfState_SetwTable
 
-    function TDarkEnergyEqnOfState_Gamma(a)
+    function Gamma(a)
 	class(TDarkEnergyEqnOfState) :: this
 	real(dl), intent(IN) :: a
-    real(dl) :: TDarkEnergyEqnOfState_Gamma
+    real(dl) :: Gamma
 	!real(dl), intent(OUT) :: Gamma
 
-	TDarkEnergyEqnOfState_Gamma = (((1-EXP(-(a-1)/this%SteepnessDE))/&
+	Gamma = (((1-EXP(-(a-1)/this%SteepnessDE))/&
     (1-EXP(1/this%SteepnessDE)))*((1+EXP(this%atrans/this%SteepnessDE))/&
     (1+EXP(-(a-this%atrans)/this%SteepnessDE))))
 
-    end function TDarkEnergyEqnOfState_Gamma
+    end function Gamma
 
     function TDarkEnergyEqnOfState_w_de(this, a)
     	class(TDarkEnergyEqnOfState) :: this
@@ -203,7 +203,7 @@ module DarkEnergyInterface
     	real(dl), intent(IN) :: a
 
 
-        gammafunc = this%Gamma(a, this%atrans, this%SteepnessDE)
+        gammafunc = Gamma(a, this%atrans, this%SteepnessDE)
 
 
     if(.not. this%use_tabulated_w) then
