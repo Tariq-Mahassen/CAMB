@@ -188,7 +188,9 @@ module DarkEnergyInterface
 	real(dl), intent(IN) :: a
 	real(dl), intent(OUT) :: gammaa
 
-	gammaa = (((1-EXP(-(a-1)/this%SteepnessDE))/(1-EXP(1/this%SteepnessDE)))*((1+EXP(this%atrans/this%SteepnessDE))/(1+EXP(-(a-this%atrans)/this%SteepnessDE))))
+	gammaa = (((1-EXP(-(a-1)/this%SteepnessDE))/&
+    (1-EXP(1/this%SteepnessDE)))*((1+EXP(this%atrans/this%SteepnessDE))/&
+    (1+EXP(-(a-this%atrans)/this%SteepnessDE))))
 
     end function Gamma
 
@@ -242,7 +244,7 @@ module DarkEnergyInterface
 
       	!Integrating Dark Energy Function
       	real(dl) function integrable_function(a_prime)
-        real(dl), intent(in) :: a_prime, integrable_function
+        real(dl), intent(in) :: a_prime
         integrable_function = Gamma(a_prime) / a_prime
       end function integrable_function
 
