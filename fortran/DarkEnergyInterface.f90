@@ -209,7 +209,7 @@ module DarkEnergyInterface
 
     function TDarkEnergyEqnOfState_w_de(this, a)
     	class(TDarkEnergyEqnOfState) :: this
-    	real(dl) :: TDarkEnergyEqnOfState_w_de, al
+    	real(dl) :: TDarkEnergyEqnOfState_w_de, al, gammafunc
     	real(dl), intent(IN) :: a
 
 
