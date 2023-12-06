@@ -213,12 +213,12 @@ module DarkEnergyInterface
     	real(dl), intent(IN) :: a
 
 
-        !gammafunc = TDarkEnergyEqnOfState_Gamma(a, this%atrans, this%SteepnessDE)
+       !gammafunc = TDarkEnergyEqnOfState_Gamma(a, this%atrans, this%SteepnessDE)
 
 
     if(.not. this%use_tabulated_w) then
 	TDarkEnergyEqnOfState_w_de= this%w_lam + (this%w_m - this%w_lam)*&
-    TDarkEnergyEqnOfState_Gamma(a, this%atrans, this%SteepnessDE)
+    (call this%TDarkEnergyEqnOfState_Gamma(a, this%atrans, this%SteepnessDE))
     else
         al=dlog(a)
         if(al <= this%equation_of_state%Xmin_interp) then
