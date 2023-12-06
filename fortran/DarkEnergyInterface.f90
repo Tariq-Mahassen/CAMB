@@ -17,7 +17,6 @@ module DarkEnergyInterface
     procedure :: PerturbationInitial
     procedure :: PerturbationEvolve
     procedure :: PrintFeedback
-    procedure :: Gamma
     ! do not have to implement w_de or grho_de if BackgroundDensityAndPressure is inherited directly
     procedure :: w_de
     procedure :: grho_de
@@ -42,23 +41,12 @@ module DarkEnergyInterface
     procedure :: SetwTable => TDarkEnergyEqnOfState_SetwTable
     procedure :: PrintFeedback => TDarkEnergyEqnOfState_PrintFeedback
     procedure :: w_de => TDarkEnergyEqnOfState_w_de
-    procedure :: Gamma => TDarkEnergyEqnOfState_Gamma
     procedure :: grho_de => TDarkEnergyEqnOfState_grho_de
     procedure :: Effective_w_wa => TDarkEnergyEqnOfState_Effective_w_wa
     end type TDarkEnergyEqnOfState
 
     public TDarkEnergyModel, TDarkEnergyEqnOfState
     contains
-
-    function Gamma(this, a)
-	class(TDarkEnergyModel) :: this
-	real(dl), intent(IN) :: a
-    real(dl) :: Gamma
-	!real(dl), intent(OUT) :: Gamma
-
-	Gamma = 0_dl
-
-    end function Gamma
 
     function w_de(this, a)
     class(TDarkEnergyModel) :: this
@@ -195,29 +183,16 @@ module DarkEnergyInterface
 
     end subroutine TDarkEnergyEqnOfState_SetwTable
 
-    function TDarkEnergyEqnOfState_Gamma(this, a)
-	class(TDarkEnergyEqnOfState) :: this
-	real(dl), intent(IN) :: a
-    real(dl) :: TDarkEnergyEqnOfState_Gamma
-	!real(dl), intent(OUT) :: Gamma
-
-	TDarkEnergyEqnOfState_Gamma = (((1-EXP(-(a-1)/this%SteepnessDE))/&
-    (1-EXP(1/this%SteepnessDE)))*((1+EXP(this%atrans/this%SteepnessDE))/&
-    (1+EXP(-(a-this%atrans)/this%SteepnessDE))))
-
-    end function TDarkEnergyEqnOfState_Gamma
-
     function TDarkEnergyEqnOfState_w_de(this, a)
     	class(TDarkEnergyEqnOfState) :: this
-    	real(dl) :: TDarkEnergyEqnOfState_w_de, al, gammafunc
+    	real(dl) :: TDarkEnergyEqnOfState_w_de, al
     	real(dl), intent(IN) :: a
 
 
-       gammafunc = this%TDarkEnergyEqnOfState_Gamma(a, this%atrans, this%SteepnessDE)
-
-
     if(.not. this%use_tabulated_w) then
-	TDarkEnergyEqnOfState_w_de= this%w_lam + (this%w_m - this%w_lam)*gammafunc
+	TDarkEnergyEqnOfState_w_de= this%w_lam + (this%w_m - this%w_lam)*(((1-EXP(-(a-1)/this%SteepnessDE))/&
+    (1-EXP(1/this%SteepnessDE)))*((1+EXP(this%atrans/this%SteepnessDE))/&
+    (1+EXP(-(a-this%atrans)/this%SteepnessDE))))
     
     else
         al=dlog(a)
@@ -260,8 +235,9 @@ module DarkEnergyInterface
       	!Integrating Dark Energy Function
       	real(dl) function integrable_function(a_prime)
         real(dl), intent(in) :: a_prime
-        real(dl) :: TDarkEnergyEqnOfState_Gamma
-        integrable_function = TDarkEnergyEqnOfState_Gamma(a_prime) / a_prime
+        integrable_function = (((1-EXP(-(a_prime-1)/this%SteepnessDE))/&
+    (1-EXP(1/this%SteepnessDE)))*((1+EXP(this%atrans/this%SteepnessDE))/&
+    (1+EXP(-(a_prime-this%atrans)/this%SteepnessDE)))) / a_prime
       end function integrable_function
 
   end function Integrate_Dark_Energy
@@ -273,7 +249,7 @@ module DarkEnergyInterface
 
     if(.not. this%use_tabulated_w) then
         grho_de = a ** (1._dl - 3. * this%w_lam)
-        if (this%wa/=0) grho_de=grho_de*exp(-3. * (this%w_m - this%w_lam) * (Integrate_Dark_Energy(a)))
+        if (this%wa/=0) grho_de=grho_de*exp(-3. * (this%w_m - this%w_lam) * (this%Integrate_Dark_Energy()))
     else
         if(a == 0.d0)then
             grho_de = 0.d0      !assume rho_de*a^4-->0, when a-->0, OK if w_de always <0.
