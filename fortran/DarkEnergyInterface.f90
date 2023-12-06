@@ -205,7 +205,7 @@ module DarkEnergyInterface
     (1-EXP(1/this%SteepnessDE)))*((1+EXP(this%atrans/this%SteepnessDE))/&
     (1+EXP(-(a-this%atrans)/this%SteepnessDE))))
 
-    end function Gamma
+    end function TDarkEnergyEqnOfState_Gamma
 
     function TDarkEnergyEqnOfState_w_de(this, a)
     	class(TDarkEnergyEqnOfState) :: this
