@@ -42,13 +42,23 @@ module DarkEnergyInterface
     procedure :: SetwTable => TDarkEnergyEqnOfState_SetwTable
     procedure :: PrintFeedback => TDarkEnergyEqnOfState_PrintFeedback
     procedure :: w_de => TDarkEnergyEqnOfState_w_de
-    !procedure :: Gamma => Gamma
+    !procedure :: Gamma => TDarkEnergyEqnOfState_Gamma
     procedure :: grho_de => TDarkEnergyEqnOfState_grho_de
     procedure :: Effective_w_wa => TDarkEnergyEqnOfState_Effective_w_wa
     end type TDarkEnergyEqnOfState
 
     public TDarkEnergyModel, TDarkEnergyEqnOfState
     contains
+
+    function Gamma(this, a)
+	class(TDarkEnergyModel) :: this
+	real(dl), intent(IN) :: a
+    real(dl) :: Gamma
+	!real(dl), intent(OUT) :: Gamma
+
+	Gamma = 0_dl
+
+    end function Gamma
 
     function w_de(this, a)
     class(TDarkEnergyModel) :: this
@@ -185,13 +195,13 @@ module DarkEnergyInterface
 
     end subroutine TDarkEnergyEqnOfState_SetwTable
 
-    function Gamma(this, a)
+    function TDarkEnergyEqnOfState_Gamma(this, a)
 	class(TDarkEnergyEqnOfState) :: this
 	real(dl), intent(IN) :: a
-    real(dl) :: Gamma
+    real(dl) :: TDarkEnergyEqnOfState_Gamma
 	!real(dl), intent(OUT) :: Gamma
 
-	Gamma = (((1-EXP(-(a-1)/this%SteepnessDE))/&
+	TDarkEnergyEqnOfState_Gamma = (((1-EXP(-(a-1)/this%SteepnessDE))/&
     (1-EXP(1/this%SteepnessDE)))*((1+EXP(this%atrans/this%SteepnessDE))/&
     (1+EXP(-(a-this%atrans)/this%SteepnessDE))))
 
@@ -203,7 +213,7 @@ module DarkEnergyInterface
     	real(dl), intent(IN) :: a
 
 
-        gammafunc = Gamma(a, this%atrans, this%SteepnessDE)
+        gammafunc = TDarkEnergyEqnOfState_Gamma(a, this%atrans, this%SteepnessDE)
 
 
     if(.not. this%use_tabulated_w) then
@@ -249,7 +259,8 @@ module DarkEnergyInterface
       	!Integrating Dark Energy Function
       	real(dl) function integrable_function(a_prime)
         real(dl), intent(in) :: a_prime
-        integrable_function = Gamma(a_prime) / a_prime
+        real(dl) :: TDarkEnergyEqnOfState_Gamma
+        integrable_function = TDarkEnergyEqnOfState_Gamma(a_prime) / a_prime
       end function integrable_function
 
   end function Integrate_Dark_Energy
