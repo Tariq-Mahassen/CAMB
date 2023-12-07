@@ -2,7 +2,7 @@ module DarkEnergyInterface
     use precision
     use interpolation
     use classes
-    !use quadpack
+    use quadpack
     implicit none
 
     private
