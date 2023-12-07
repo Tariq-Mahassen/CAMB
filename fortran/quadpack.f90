@@ -1,3 +1,4 @@
+module QUADPACK
       subroutine dqagse(f,a,b,epsabs,epsrel,limit,result,abserr,neval,ier,alist,blist,rlist,elist,iord,last)
 c***begin prologue  dqagse
 c***date written   800101   (yymmdd)
@@ -936,3 +937,4 @@ c
       ermax = elist(maxerr)
       return
       end
+end module QUADPACK
