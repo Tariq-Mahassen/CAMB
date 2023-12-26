@@ -68,7 +68,8 @@ module DarkEnergyInterface
 
     end function grho_de
 
-    function TrapezoidalIntegration(intl, fnl, n) result(resultValue)
+    function TrapezoidalIntegration(this, intl, fnl, n) result(resultValue)
+    class(TDarkEnergyModel), intent(inout) :: this
     real(dl), INTENT(IN) :: intl, fnl
     INTEGER, INTENT(IN) :: n
     real(dl) :: resultValue
@@ -251,7 +252,8 @@ module DarkEnergyInterface
 
     end subroutine TDarkEnergyEqnOfState_Effective_w_wa
 
-    function TDarkEnergyEqnOfState_TrapezoidalIntegration(intl, fnl, n) result(resultValue)
+    function TDarkEnergyEqnOfState_TrapezoidalIntegration(this, intl, fnl, n) result(resultValue)
+    class(TDarkEnergyEqnOfState) :: this
     real(dl), INTENT(IN) :: intl, fnl
     INTEGER, INTENT(IN) :: n
     real(dl) :: resultValue
