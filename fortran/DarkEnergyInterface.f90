@@ -43,7 +43,7 @@ module DarkEnergyInterface
     procedure :: w_de => TDarkEnergyEqnOfState_w_de
     procedure :: grho_de => TDarkEnergyEqnOfState_grho_de
     procedure :: Effective_w_wa => TDarkEnergyEqnOfState_Effective_w_wa
-    procedure :: Integrate_Dark_Energy
+    procedure :: TrapezoidalIntegration
     end type TDarkEnergyEqnOfState
 
     public TDarkEnergyModel, TDarkEnergyEqnOfState
@@ -245,7 +245,7 @@ module DarkEnergyInterface
     contains
 	 !Integrating Dark Energy Function
      real(dl) function integrable_function(a_prime)
-     class(TDarkEnergyEqnOfState), intent(inout) :: this
+     class(TDarkEnergyEqnOfState) :: this
      real(dl), intent(in) :: a_prime
      integrable_function = (((1-EXP(-(a_prime-1)/this%SteepnessDE))/&
      (1-EXP(1/this%SteepnessDE)))*((1+EXP(this%atrans/this%SteepnessDE))/&
