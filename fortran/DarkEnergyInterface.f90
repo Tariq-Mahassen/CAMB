@@ -21,6 +21,7 @@ module DarkEnergyInterface
     procedure :: w_de
     procedure :: grho_de
     procedure :: Effective_w_wa !Used as approximate values for non-linear corrections
+    procedure :: TrapezoidalIntegration
     end type TDarkEnergyModel
 
     type, extends(TDarkEnergyModel) :: TDarkEnergyEqnOfState
@@ -43,7 +44,7 @@ module DarkEnergyInterface
     procedure :: w_de => TDarkEnergyEqnOfState_w_de
     procedure :: grho_de => TDarkEnergyEqnOfState_grho_de
     procedure :: Effective_w_wa => TDarkEnergyEqnOfState_Effective_w_wa
-    procedure :: TrapezoidalIntegration
+    procedure :: TrapezoidalIntegration => TDarkEnergyEqnOfState_TrapezoidalIntegration
     end type TDarkEnergyEqnOfState
 
     public TDarkEnergyModel, TDarkEnergyEqnOfState
@@ -66,6 +67,38 @@ module DarkEnergyInterface
     grho_de =0._dl
 
     end function grho_de
+
+    function TrapezoidalIntegration(intl, fnl, n) result(resultValue)
+    real(dl), INTENT(IN) :: intl, fnl
+    INTEGER, INTENT(IN) :: n
+    real(dl) :: resultValue
+
+    real(dl):: h, x
+    INTEGER :: i
+ 
+    ! Step size
+    h = (fnl - intl) / n
+
+    ! Initialize result
+    resultValue = (f(intl) + f(fnl))*0.5d0
+
+    ! Trapezoidal rule summation
+    DO i = 1, n - 1
+     x = intl + REAL(i) * h
+     resultValue = resultValue + f(x)
+    END DO
+
+    ! Multiply by step size to get the final result
+    resultValue = resultValue * h
+ 
+    contains
+    function f(x_prime)
+    real(dl), INTENT(IN) :: x_prime
+    real(dl) :: f
+    f = x_prime
+    end function f
+ 
+    end function TrapezoidalIntegration
 
     subroutine PrintFeedback(this, FeedbackLevel)
     class(TDarkEnergyModel) :: this
@@ -218,7 +251,7 @@ module DarkEnergyInterface
 
     end subroutine TDarkEnergyEqnOfState_Effective_w_wa
 
-    function TrapezoidalIntegration(intl, fnl, n) result(resultValue)
+    function TDarkEnergyEqnOfState_TrapezoidalIntegration(intl, fnl, n) result(resultValue)
     real(dl), INTENT(IN) :: intl, fnl
     INTEGER, INTENT(IN) :: n
     real(dl) :: resultValue
@@ -252,7 +285,7 @@ module DarkEnergyInterface
      (1+EXP(-(a_prime-this%atrans)/this%SteepnessDE)))) / a_prime
      end function integrable_function
 
-    end function TrapezoidalIntegration
+    end function TDarkEnergyEqnOfState_TrapezoidalIntegration
 
     function TDarkEnergyEqnOfState_grho_de(this, a) result(grho_de) !relative density (8 pi G a^4 rho_de /grhov)
     class(TDarkEnergyEqnOfState) :: this
@@ -261,7 +294,7 @@ module DarkEnergyInterface
 
     if(.not. this%use_tabulated_w) then
         grho_de = a ** (1._dl - 3. * this%w_lam)
-        if (this%wa/=0) grho_de=grho_de*exp(-3. * (this%w_m - this%w_lam) * (this%TrapezoidalIntegration(1,a,10000)))
+        if (this%wa/=0) grho_de=grho_de*exp(-3. * (this%w_m - this%w_lam) * (this%TDarkEnergyEqnOfState_TrapezoidalIntegration(1,a,10000)))
     else
         if(a == 0.d0)then
             grho_de = 0.d0      !assume rho_de*a^4-->0, when a-->0, OK if w_de always <0.
