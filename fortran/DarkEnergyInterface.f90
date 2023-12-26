@@ -219,30 +219,41 @@ module DarkEnergyInterface
 
     end subroutine TDarkEnergyEqnOfState_Effective_w_wa
 
-    function Integrate_Dark_Energy(this) result(result)
-    class(TDarkEnergyEqnOfState), intent(inout) :: this
-    real(dl) :: result
-    integer :: neval, infod
-    real(dl) :: a, intl, fnl
+    function TrapezoidalIntegration(intl, fnl, n) result(resultValue)
+    real(dl), INTENT(IN) :: intl, fnl
+    INTEGER, INTENT(IN) :: n
+    real(dl) :: resultValue
 
-    !Limits
-    intl = 1._dl
-    fnl = a
+    real(dl):: h, x
+    INTEGER :: i
 
-    	!Call QUADPACK routine for numerical integration
-    	call dqagse(integrable_function, intl, fnl, 1.0E-10_dl, 1.0E-10_dl, result, neval, infod)
 
+    ! Step size
+    h = (fnl - intl) / n
+
+    ! Initialize result
+    resultValue = (integrable_function(intl) + integrable_function(fnl))*0.5d0
+
+    ! Trapezoidal rule summation
+    DO i = 1, n - 1
+     x = intl + REAL(i) * h
+     resultValue = resultValue + integrable_function(x)
+    END DO
+
+    ! Multiply by step size to get the final result
+    resultValue = resultValue * h
+    
     contains
+	 !Integrating Dark Energy Function
+     real(dl) function integrable_function(a_prime)
+     class(TDarkEnergyEqnOfState), intent(inout) :: this
+     real(dl), intent(in) :: a_prime
+     integrable_function = (((1-EXP(-(a_prime-1)/this%SteepnessDE))/&
+     (1-EXP(1/this%SteepnessDE)))*((1+EXP(this%atrans/this%SteepnessDE))/&
+     (1+EXP(-(a_prime-this%atrans)/this%SteepnessDE)))) / a_prime
+     end function integrable_function
 
-      	!Integrating Dark Energy Function
-      	real(dl) function integrable_function(a_prime)
-        real(dl), intent(in) :: a_prime
-        integrable_function = (((1-EXP(-(a_prime-1)/this%SteepnessDE))/&
-    (1-EXP(1/this%SteepnessDE)))*((1+EXP(this%atrans/this%SteepnessDE))/&
-    (1+EXP(-(a_prime-this%atrans)/this%SteepnessDE)))) / a_prime
-      end function integrable_function
-
-  end function Integrate_Dark_Energy
+    end function TrapezoidalIntegration
 
     function TDarkEnergyEqnOfState_grho_de(this, a) result(grho_de) !relative density (8 pi G a^4 rho_de /grhov)
     class(TDarkEnergyEqnOfState) :: this
@@ -251,7 +262,7 @@ module DarkEnergyInterface
 
     if(.not. this%use_tabulated_w) then
         grho_de = a ** (1._dl - 3. * this%w_lam)
-        if (this%wa/=0) grho_de=grho_de*exp(-3. * (this%w_m - this%w_lam) * (this%Integrate_Dark_Energy()))
+        if (this%wa/=0) grho_de=grho_de*exp(-3. * (this%w_m - this%w_lam) * (this%TrapezoidalIntegration(1,a,10000)))
     else
         if(a == 0.d0)then
             grho_de = 0.d0      !assume rho_de*a^4-->0, when a-->0, OK if w_de always <0.
