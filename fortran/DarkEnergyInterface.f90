@@ -68,29 +68,29 @@ module DarkEnergyInterface
 
     end function grho_de
 
-    function TrapezoidalIntegration(this, intl, fnl, n) result(resultValue)
+    function TrapezoidalIntegration(this, intl, khalas, number) result(resultValue)
     class(TDarkEnergyModel), intent(inout) :: this
-    real(dl), INTENT(IN) :: intl, fnl
-    INTEGER, INTENT(IN) :: n
+    real(dl), INTENT(IN) :: intl, khalas
+    INTEGER, INTENT(IN) :: number
     real(dl) :: resultValue
 
-    real(dl):: h, x
+    real(dl):: stepsize, x
     INTEGER :: i
  
     ! Step size
-    h = (fnl - intl) / n
+    stepsize = (khalas - intl) / number
 
     ! Initialize result
-    resultValue = (f(intl) + f(fnl))*0.5d0
+    resultValue = (f(intl) + f(khalas))*0.5d0
 
     ! Trapezoidal rule summation
-    DO i = 1, n - 1
-     x = intl + REAL(i) * h
+    DO i = 1, number - 1
+     x = intl + REAL(i) * stepsize
      resultValue = resultValue + f(x)
     END DO
 
     ! Multiply by step size to get the final result
-    resultValue = resultValue * h
+    resultValue = resultValue * stepsize
  
     contains
     function f(x_prime)
@@ -252,30 +252,30 @@ module DarkEnergyInterface
 
     end subroutine TDarkEnergyEqnOfState_Effective_w_wa
 
-    function TDarkEnergyEqnOfState_TrapezoidalIntegration(this, intl, fnl, n) result(resultValue)
+    function TDarkEnergyEqnOfState_TrapezoidalIntegration(this, intl, khalas, number) result(resultValue)
     class(TDarkEnergyEqnOfState) :: this
-    real(dl), INTENT(IN) :: intl, fnl
-    INTEGER, INTENT(IN) :: n
+    real(dl), INTENT(IN) :: intl, khalas
+    INTEGER, INTENT(IN) :: number
     real(dl) :: resultValue
 
-    real(dl):: h, x
+    real(dl):: stepsize, x
     INTEGER :: i
 
 
     ! Step size
-    h = (fnl - intl) / n
+    stepsize = (khalas - intl) / number
 
     ! Initialize result
-    resultValue = (integrable_function(intl) + integrable_function(fnl))*0.5d0
+    resultValue = (integrable_function(intl) + integrable_function(khalas))*0.5d0
 
     ! Trapezoidal rule summation
-    DO i = 1, n - 1
-     x = intl + REAL(i) * h
+    DO i = 1, number - 1
+     x = intl + REAL(i) * stepsize
      resultValue = resultValue + integrable_function(x)
     END DO
 
     ! Multiply by step size to get the final result
-    resultValue = resultValue * h
+    resultValue = resultValue * stepsize
     
     contains
 	 !Integrating Dark Energy Function
