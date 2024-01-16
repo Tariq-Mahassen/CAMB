@@ -71,7 +71,7 @@ module DarkEnergyInterface
     function TrapezoidalIntegration(this, intl, khalas, numbers) result(resultValue)
     class(TDarkEnergyModel), intent(inout) :: this
     real(dl), INTENT(IN) :: intl, khalas
-    INTEGER, INTENT(IN) :: numbers
+    real(dl), INTENT(IN) :: numbers
     real(dl) :: resultValue
 
     real(dl):: stepsize, x
@@ -84,7 +84,7 @@ module DarkEnergyInterface
     resultValue = (f(intl) + f(khalas))*0.5d0
 
     ! Trapezoidal rule summation
-    DO i = 1, numbers - 1
+    DO i = 1, INT(numbers) - 1
      x = intl + REAL(i) * stepsize
      resultValue = resultValue + f(x)
     END DO
@@ -255,7 +255,7 @@ module DarkEnergyInterface
     function TDarkEnergyEqnOfState_TrapezoidalIntegration(this, intl, khalas, numbers) result(resultValue)
     class(TDarkEnergyEqnOfState), intent(inout) :: this
     real(dl), INTENT(IN) :: intl, khalas
-    INTEGER, INTENT(IN) :: numbers 
+    real(dl), INTENT(IN) :: numbers 
     real(dl) :: resultValue
 
     real(dl):: stepsize, x
@@ -269,7 +269,7 @@ module DarkEnergyInterface
     resultValue = (integrable_function(intl) + integrable_function(khalas))*0.5d0
 
     ! Trapezoidal rule summation
-    DO i = 1, numbers - 1
+    DO i = 1, INT(numbers) - 1
      x = intl + REAL(i) * stepsize
      resultValue = resultValue + integrable_function(x)
     END DO
