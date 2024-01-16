@@ -75,7 +75,7 @@ module DarkEnergyInterface
     real(dl) :: resultValue
 
     real(dl):: stepsize, x
-    real(dl) :: i
+    INTEGER:: i
  
     ! Step size
     stepsize = (khalas - intl) / numbers
@@ -255,11 +255,11 @@ module DarkEnergyInterface
     function TDarkEnergyEqnOfState_TrapezoidalIntegration(this, intl, khalas, numbers) result(resultValue)
     class(TDarkEnergyEqnOfState), intent(inout) :: this
     real(dl), INTENT(IN) :: intl, khalas
-    real(dl), INTENT(IN) :: numbers
+    real(dl), INTENT(IN) :: numbers 
     real(dl) :: resultValue
 
     real(dl):: stepsize, x
-    real(dl) :: i
+    INTEGER :: i
 
 
     ! Step size
