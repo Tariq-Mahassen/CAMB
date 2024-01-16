@@ -71,11 +71,11 @@ module DarkEnergyInterface
     function TrapezoidalIntegration(this, intl, khalas, numbers) result(resultValue)
     class(TDarkEnergyModel), intent(inout) :: this
     real(dl), INTENT(IN) :: intl, khalas
-    INTEGER, INTENT(IN) :: numbers
+    real(dl), INTENT(IN) :: numbers
     real(dl) :: resultValue
 
     real(dl):: stepsize, x
-    INTEGER :: i
+    real(dl) :: i
  
     ! Step size
     stepsize = (khalas - intl) / numbers
@@ -255,11 +255,11 @@ module DarkEnergyInterface
     function TDarkEnergyEqnOfState_TrapezoidalIntegration(this, intl, khalas, numbers) result(resultValue)
     class(TDarkEnergyEqnOfState), intent(inout) :: this
     real(dl), INTENT(IN) :: intl, khalas
-    INTEGER, INTENT(IN) :: numbers
+    real(dl), INTENT(IN) :: numbers
     real(dl) :: resultValue
 
     real(dl):: stepsize, x
-    INTEGER :: i
+    real(dl) :: i
 
 
     ! Step size
@@ -296,7 +296,7 @@ module DarkEnergyInterface
 
     if(.not. this%use_tabulated_w) then
         grho_de = a ** (1._dl - 3. * this%w_lam)
-        if (this%wa/=0) grho_de=grho_de*exp(-3. * (this%w_m - this%w_lam) * (this%TrapezoidalIntegration(1.d0,a,10000)))
+        if (this%wa/=0) grho_de=grho_de*exp(-3. * (this%w_m - this%w_lam) * (this%TrapezoidalIntegration(1.d0,a,10000.d0)))
     else
         if(a == 0.d0)then
             grho_de = 0.d0      !assume rho_de*a^4-->0, when a-->0, OK if w_de always <0.
