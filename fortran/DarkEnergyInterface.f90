@@ -69,7 +69,7 @@ module DarkEnergyInterface
     end function grho_de
 
     function TrapezoidalIntegration(this, intl, khalas, numbers) result(resultValue)
-    class(TDarkEnergyModel) :: this
+    class(TDarkEnergyModel), intent(inout) :: this
     real(dl), INTENT(IN) :: intl, khalas
     INTEGER, INTENT(IN) :: numbers
     real(dl) :: resultValue
@@ -253,7 +253,7 @@ module DarkEnergyInterface
     end subroutine TDarkEnergyEqnOfState_Effective_w_wa
 
     function TDarkEnergyEqnOfState_TrapezoidalIntegration(this, intl, khalas, numbers) result(resultValue)
-    class(TDarkEnergyEqnOfState) :: this
+    class(TDarkEnergyEqnOfState), intent(inout) :: this
     real(dl), INTENT(IN) :: intl, khalas
     INTEGER, INTENT(IN) :: numbers
     real(dl) :: resultValue
@@ -296,7 +296,7 @@ module DarkEnergyInterface
 
     if(.not. this%use_tabulated_w) then
         grho_de = a ** (1._dl - 3. * this%w_lam)
-        if (this%wa/=0) grho_de=grho_de*exp(-3. * (this%w_m - this%w_lam) * (this%TDarkEnergyEqnOfState_TrapezoidalIntegration(1,a,10000)))
+        if (this%wa/=0) grho_de=grho_de*exp(-3. * (this%w_m - this%w_lam) * (this%TrapezoidalIntegration(1.d0,a,10000)))
     else
         if(a == 0.d0)then
             grho_de = 0.d0      !assume rho_de*a^4-->0, when a-->0, OK if w_de always <0.
