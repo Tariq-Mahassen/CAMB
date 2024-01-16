@@ -253,7 +253,7 @@ module DarkEnergyInterface
     end subroutine TDarkEnergyEqnOfState_Effective_w_wa
 
     function TDarkEnergyEqnOfState_TrapezoidalIntegration(this, intl, khalas, numbers) result(resultValue)
-    class(TDarkEnergyEqnOfState), INTENT(INOUT) :: this
+    class(TDarkEnergyEqnOfState) :: this
     real(dl), INTENT(IN) :: intl, khalas
     INTEGER, INTENT(IN) :: numbers
     real(dl) :: resultValue
@@ -280,7 +280,7 @@ module DarkEnergyInterface
     contains
 	 !Integrating Dark Energy Function
      real(dl) function integrable_function(a_prime)
-     class(TDarkEnergyEqnOfState) :: this
+     !class(TDarkEnergyEqnOfState) :: this
      real(dl), intent(in) :: a_prime
      integrable_function = (((1-EXP(-(a_prime-1)/this%SteepnessDE))/&
      (1-EXP(1/this%SteepnessDE)))*((1+EXP(this%atrans/this%SteepnessDE))/&
