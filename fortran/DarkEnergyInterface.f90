@@ -253,7 +253,7 @@ module DarkEnergyInterface
     end subroutine TDarkEnergyEqnOfState_Effective_w_wa
 
     function TDarkEnergyEqnOfState_TrapezoidalIntegration(this, intl, khalas, numbers) result(resultValue)
-    class(TDarkEnergyEqnOfState) :: this
+    class(TDarkEnergyEqnOfState), INTENT(INOUT) :: this
     real(dl), INTENT(IN) :: intl, khalas
     INTEGER, INTENT(IN) :: numbers
     real(dl) :: resultValue
