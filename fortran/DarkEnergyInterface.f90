@@ -21,7 +21,7 @@ module DarkEnergyInterface
     procedure :: w_de
     procedure :: grho_de
     procedure :: Effective_w_wa !Used as approximate values for non-linear corrections
-    procedure :: TrapezoidalIntegration
+    !procedure :: TrapezoidalIntegration
     end type TDarkEnergyModel
 
     type, extends(TDarkEnergyModel) :: TDarkEnergyEqnOfState
@@ -44,7 +44,7 @@ module DarkEnergyInterface
     procedure :: w_de => TDarkEnergyEqnOfState_w_de
     procedure :: grho_de => TDarkEnergyEqnOfState_grho_de
     procedure :: Effective_w_wa => TDarkEnergyEqnOfState_Effective_w_wa
-    procedure :: TrapezoidalIntegration => TDarkEnergyEqnOfState_TrapezoidalIntegration
+    !procedure :: TrapezoidalIntegration => TDarkEnergyEqnOfState_TrapezoidalIntegration
     end type TDarkEnergyEqnOfState
 
     public TDarkEnergyModel, TDarkEnergyEqnOfState
@@ -68,38 +68,38 @@ module DarkEnergyInterface
 
     end function grho_de
 
-    function TrapezoidalIntegration(this, intl, khalas, numbers) result(resultValue)
-    class(TDarkEnergyModel), intent(inout) :: this
-    real(dl), INTENT(IN) :: intl, khalas
-    real(dl), INTENT(IN) :: numbers
-    real(dl) :: resultValue
+    !function TrapezoidalIntegration(this, intl, khalas, numbers) result(resultValue)
+    !class(TDarkEnergyModel), intent(inout) :: this
+    !real(dl), INTENT(IN) :: intl, khalas
+    !real(dl), INTENT(IN) :: numbers
+    !real(dl) :: resultValue
 
-    real(dl):: stepsize, x
-    INTEGER:: i
+    !real(dl):: stepsize, x
+    !INTEGER:: i
  
     ! Step size
-    stepsize = (khalas - intl) / numbers
+    !stepsize = (khalas - intl) / numbers
 
     ! Initialize result
-    resultValue = (f(intl) + f(khalas))*0.5d0
+    !resultValue = (f(intl) + f(khalas))*0.5d0
 
     ! Trapezoidal rule summation
-    DO i = 1, INT(numbers) - 1
-     x = intl + REAL(i) * stepsize
-     resultValue = resultValue + f(x)
-    END DO
+    !DO i = 1, INT(numbers) - 1
+     !x = intl + REAL(i) * stepsize
+     !resultValue = resultValue + f(x)
+    !END DO
 
     ! Multiply by step size to get the final result
-    resultValue = resultValue * stepsize
+    !resultValue = resultValue * stepsize
  
-    contains
-    function f(x_prime)
-    real(dl), INTENT(IN) :: x_prime
-    real(dl) :: f
-    f = x_prime
-    end function f
+    !contains
+    !function f(x_prime)
+    !real(dl), INTENT(IN) :: x_prime
+    !real(dl) :: f
+    !f = x_prime
+    !end function f
  
-    end function TrapezoidalIntegration
+    !end function TrapezoidalIntegration
 
     subroutine PrintFeedback(this, FeedbackLevel)
     class(TDarkEnergyModel) :: this
@@ -252,42 +252,42 @@ module DarkEnergyInterface
 
     end subroutine TDarkEnergyEqnOfState_Effective_w_wa
 
-    function TDarkEnergyEqnOfState_TrapezoidalIntegration(this, intl, khalas, numbers) result(resultValue)
-    class(TDarkEnergyEqnOfState), intent(inout) :: this
-    real(dl), INTENT(IN) :: intl, khalas
-    real(dl), INTENT(IN) :: numbers 
-    real(dl) :: resultValue
+    !function TDarkEnergyEqnOfState_TrapezoidalIntegration(this, intl, khalas, numbers) result(resultValue)
+    !class(TDarkEnergyEqnOfState), intent(inout) :: this
+    !real(dl), INTENT(IN) :: intl, khalas
+    !real(dl), INTENT(IN) :: numbers 
+    !real(dl) :: resultValue
 
-    real(dl):: stepsize, x
-    INTEGER :: i
+    !real(dl):: stepsize, x
+    !INTEGER :: i
 
 
     ! Step size
-    stepsize = (khalas - intl) / numbers
+    !stepsize = (khalas - intl) / numbers
 
     ! Initialize result
-    resultValue = (integrable_function(intl) + integrable_function(khalas))*0.5d0
+    !resultValue = (integrable_function(intl) + integrable_function(khalas))*0.5d0
 
     ! Trapezoidal rule summation
-    DO i = 1, INT(numbers) - 1
-     x = intl + REAL(i) * stepsize
-     resultValue = resultValue + integrable_function(x)
-    END DO
+    !DO i = 1, INT(numbers) - 1
+     !x = intl + REAL(i) * stepsize
+     !resultValue = resultValue + integrable_function(x)
+    !END DO
 
     ! Multiply by step size to get the final result
-    resultValue = resultValue * stepsize
+    !resultValue = resultValue * stepsize
     
-    contains
+    !contains
 	 !Integrating Dark Energy Function
-     real(dl) function integrable_function(a_prime)
+     !real(dl) function integrable_function(a_prime)
      !class(TDarkEnergyEqnOfState) :: this
-     real(dl), intent(in) :: a_prime
-     integrable_function = (((1-EXP(-(a_prime-1)/this%SteepnessDE))/&
-     (1-EXP(1/this%SteepnessDE)))*((1+EXP(this%atrans/this%SteepnessDE))/&
-     (1+EXP(-(a_prime-this%atrans)/this%SteepnessDE)))) / a_prime
-     end function integrable_function
+     !real(dl), intent(in) :: a_prime
+     !integrable_function = (((1-EXP(-(a_prime-1)/this%SteepnessDE))/&
+     !(1-EXP(1/this%SteepnessDE)))*((1+EXP(this%atrans/this%SteepnessDE))/&
+     !(1+EXP(-(a_prime-this%atrans)/this%SteepnessDE)))) / a_prime
+     !end function integrable_function
 
-    end function TDarkEnergyEqnOfState_TrapezoidalIntegration
+    !end function TDarkEnergyEqnOfState_TrapezoidalIntegration
 
     function TDarkEnergyEqnOfState_grho_de(this, a) result(grho_de) !relative density (8 pi G a^4 rho_de /grhov)
     class(TDarkEnergyEqnOfState) :: this
@@ -296,7 +296,9 @@ module DarkEnergyInterface
 
     if(.not. this%use_tabulated_w) then
         grho_de = a ** (1._dl - 3. * this%w_lam)
-        if (this%wa/=0) grho_de=grho_de*exp(-3. * (this%w_m - this%w_lam) * (this%TrapezoidalIntegration(1.d0,a,10000.d0)))
+        if (this%wa/=0) grho_de=grho_de*exp(-3. * (this%w_m - this%w_lam) * (((1-EXP(-(a-1)/this%SteepnessDE))/&
+        (1-EXP(1/this%SteepnessDE)))*((1+EXP(this%atrans/this%SteepnessDE))/&
+        (1+EXP(-(a-this%atrans)/this%SteepnessDE)))) / a)
     else
         if(a == 0.d0)then
             grho_de = 0.d0      !assume rho_de*a^4-->0, when a-->0, OK if w_de always <0.
